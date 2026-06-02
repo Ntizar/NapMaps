@@ -1,0 +1,18 @@
+{
+  "name": "napmaps",
+  "private": true,
+  "version": "1.0.0",
+  "description": "NapMaps — visor cartográfico 3D con WebGL, edificios isométricos, clima en tiempo real y ciclo día/noche",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 3000",
+    "build": "vite build",
+    "preview": "vite preview --port 3000"
+  },
+  "dependencies": {
+    "maplibre-gl": "^4.7.1"
+  },
+  "devDependencies": {
+    "vite": "^6.3.0"
+  }
+}
