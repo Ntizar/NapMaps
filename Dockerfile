@@ -1,7 +1,7 @@
 # ================================================
 # NapMaps — Dockerfile para NaN.builders
 # Build + serve en una sola etapa con Node.js
-# Puerto: 3700
+# Puerto: 3700 (NaN) + 80 (fallback healthcheck)
 # ================================================
 
 FROM node:20-alpine
@@ -22,11 +22,10 @@ COPY src/ ./src/
 # 3. Build
 RUN npx vite build
 
-# 4. Servidor HTTP mínimo para SPA
+# 4. Servidor HTTP mínimo para SPA (escucha en PORT y 80)
 RUN echo 'const http = require("http"); \
 const fs = require("fs"); \
 const path = require("path"); \
-const PORT = process.env.PORT || 3700; \
 const DIST = path.join(__dirname, "dist"); \
 const MIME = { \
   ".html": "text/html", ".css": "text/css", \
@@ -34,7 +33,7 @@ const MIME = { \
   ".png": "image/png", ".jpg": "image/jpeg", ".svg": "image/svg+xml", \
   ".ico": "image/x-icon", ".woff2": "font/woff2" \
 }; \
-const server = http.createServer((req, res) => { \
+function handler(req, res) { \
   let filePath = path.join(DIST, req.url === "/" ? "index.html" : req.url); \
   const ext = path.extname(filePath); \
   fs.readFile(filePath, (err, data) => { \
@@ -49,12 +48,14 @@ const server = http.createServer((req, res) => { \
       res.end(data); \
     } \
   }); \
-}); \
-server.listen(PORT, "0.0.0.0", () => console.log("NapMaps en puerto " + PORT));' > server.js
+} \
+const ports = [process.env.PORT || 3700, 80]; \
+ports.forEach(p => http.createServer(handler).listen(p, "0.0.0.0", () => console.log("NapMaps en puerto " + p)));' > server.js
 
-# 5. Healthcheck
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -qO- http://localhost:3700/ || exit 1
+# 5. Healthcheck (usa puerto 80 que NaN siempre puede sondear)
+HEALTHCHECK --interval=15s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget -qO- http://localhost:80/ || exit 1
 
 EXPOSE 3700
+EXPOSE 80
 CMD ["node", "server.js"]
