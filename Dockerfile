@@ -1,39 +1,45 @@
 # ================================================
-# NapMaps — Dockerfile para NaN.builders
-# Servidor Node.js con usuario no-root (requisito NaN)
+# NapMaps — Dockerfile multi-stage para NaN.builders
+# Build con Vite → producción limpia sin devDeps
 # ================================================
 
-FROM node:20-alpine
-
+# === Stage 1: Instalar todas las dependencias ===
+FROM node:20-alpine AS deps
 WORKDIR /app
-
-ENV NODE_ENV=production
-ENV PORT=3030
-
-# 1. Dependencias de producción
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+RUN npm ci --include=dev
 
-# 2. Código fuente
+# === Stage 2: Build con Vite ===
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY index.html vite.config.js ./
 COPY public/ ./public/
 COPY src/ ./src/
-
-# 3. Build estático
 RUN npx vite build
 
-# 4. Servidor HTTP (ESM — usa .mjs)
-COPY server.mjs ./
+# === Stage 3: Producción ===
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV PORT=3030
 
-# 5. Usuario no-root (requisito NaN)
+# Crear usuario no-root
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# 6. Ajustar permisos y cambiar a usuario no-root
-RUN chown -R appuser:appgroup /app
+# Copiar package.json y reinstalar solo producción
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+# Copiar build estático
+COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
+
+# Servidor HTTP ESM
+COPY --chown=appuser:appgroup server.mjs ./
 
 USER appuser
 
-# 7. Healthcheck
+# Healthcheck
 HEALTHCHECK --interval=15s --timeout=3s --start-period=5s --retries=3 \
   CMD wget -qO- http://localhost:3030/healthz || exit 1
 
