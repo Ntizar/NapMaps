@@ -24,12 +24,12 @@ const CONFIG = {
   styles: {
     streets: {
       name: 'Calles',
-      uri: `https://tiles.stadiamaps.com/styles/alidade_smooth.json?api_key=${API_KEY}`,
+      uri: 'https://tiles.stadiamaps.com/styles/alidade_smooth.json?api_key=89affde8-a8b8-43b6-ab33-67c48c2a43b7',
       fallback: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
     },
     dark: {
       name: 'Oscuro',
-      uri: `https://tiles.stadiamaps.com/styles/alidade_smooth_dark.json?api_key=${API_KEY}`,
+      uri: 'https://tiles.stadiamaps.com/styles/alidade_smooth_dark.json?api_key=89affde8-a8b8-43b6-ab33-67c48c2a43b7',
       fallback: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
     },
     satellite: {
@@ -315,13 +315,12 @@ function setupTerrain() {
     state.map.addSource('nap-dem', {
       type: 'raster-dem',
       tiles: [
-        `https://api.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.png?api_key=${API_KEY}`,
+        'https://api.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.png?api_key=89affde8-a8b8-43b6-ab33-67c48c2a43b7',
         'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
       ],
       tileSize: 256,
       maxzoom: 15,
     });
-
     state.map.setTerrain({ source: 'nap-dem', exaggeration: 1.3 });
   } catch (e) {
     console.warn('Terreno 3D no disponible');
