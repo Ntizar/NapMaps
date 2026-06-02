@@ -1,16 +1,16 @@
 # ================================================
 # NapMaps — Dockerfile para NaN.builders
-# Build + serve en una sola etapa con Node.js
-# Puerto: 3700 (NaN) + 80 (fallback healthcheck)
+# Servidor Node.js con usuario no-root (requisito NaN)
 # ================================================
 
 FROM node:20-alpine
 
 WORKDIR /app
 
+ENV NODE_ENV=production
 ENV PORT=3700
 
-# 1. Dependencias (caché)
+# 1. Dependencias
 COPY package.json package-lock.json ./
 RUN npm ci
 
@@ -22,7 +22,10 @@ COPY src/ ./src/
 # 3. Build
 RUN npx vite build
 
-# 4. Servidor HTTP mínimo para SPA (escucha en PORT y 80)
+# 4. Usuario no-root (requisito NaN)
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# 5. Servidor HTTP Node.js (SPA + multi-puerto)
 RUN echo 'const http = require("http"); \
 const fs = require("fs"); \
 const path = require("path"); \
@@ -52,7 +55,12 @@ function handler(req, res) { \
 const ports = [process.env.PORT || 3700, 80]; \
 ports.forEach(p => http.createServer(handler).listen(p, "0.0.0.0", () => console.log("NapMaps en puerto " + p)));' > server.js
 
-# 5. Healthcheck (usa puerto 80 que NaN siempre puede sondear)
+# 6. Ajustar permisos y cambiar a usuario no-root
+RUN chown -R appuser:appgroup /app
+
+USER appuser
+
+# 7. Healthcheck
 HEALTHCHECK --interval=15s --timeout=3s --start-period=5s --retries=3 \
   CMD wget -qO- http://localhost:80/ || exit 1
 
