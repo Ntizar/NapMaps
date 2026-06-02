@@ -216,10 +216,17 @@ function initMap() {
   // Fallback si falla el estilo
   state.map.on('style.load', () => applySolarCycle());
   state.map.on('error', (e) => {
-    if (e.error?.status === 401 || e.error?.status === 404) {
-      console.warn('Stadia fallback → CartoDB');
-      state.map.setStyle(fallbackUrl);
-    }
+    console.warn('MapLibre error:', e.error?.status, e.error?.message);
+    // Fallback a CartoDB en cualquier error
+    console.warn('Stadia fallback → CartoDB');
+    state.map.setStyle(fallbackUrl);
+    state.map.once('load', () => {
+      setupBuildingsLayer();
+      setupTerrain();
+      setupPOIMarkers();
+      applySolarCycle();
+      hideLoading();
+    });
   });
 
   // Controles de navegación minimalistas
@@ -791,6 +798,36 @@ function init() {
     document.getElementById('load-progress').style.width = Math.min(p, 90) + '%';
     if (p >= 90) clearInterval(interval);
   }, 200);
+
+  // Timeout: si el mapa no carga en 12s, ocultar loading y mostrar mapa vacío
+  setTimeout(() => {
+    const loading = document.getElementById('loading');
+    if (loading && !loading.classList.contains('hidden')) {
+      console.warn('Timeout de carga — mostrando mapa sin tiles');
+      loading.classList.add('hidden');
+      // Si el mapa no se inicializó, crear uno con estilo CartoDB como fallback
+      if (!state.map) {
+        console.log('Creando mapa fallback con CartoDB');
+        state.map = new maplibregl.Map({
+          container: 'map',
+          style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+          center: CONFIG.center,
+          zoom: CONFIG.zoom,
+          pitch: CONFIG.pitch,
+          bearing: CONFIG.bearing,
+          antialias: true,
+          attributionControl: false,
+          maxPitch: CONFIG.maxPitch,
+        });
+        state.map.on('load', () => {
+          setupBuildingsLayer();
+          setupTerrain();
+          setupPOIMarkers();
+          applySolarCycle();
+        });
+      }
+    }
+  }, 12000);
 
   // Arrancar bucle de animación
   animate(0);
