@@ -8,7 +8,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=3700
+ENV PORT=3030
 
 # 1. Dependencias
 COPY package.json package-lock.json ./
@@ -57,7 +57,7 @@ function handler(req, res) { \
     } \
   }); \
 } \
-http.createServer(handler).listen(process.env.PORT || 3700, "0.0.0.0", () => console.log("NapMaps en puerto " + (process.env.PORT || 3700)));' > server.js
+http.createServer(handler).listen(process.env.PORT || 3030, "0.0.0.0", () => console.log("NapMaps en puerto " + (process.env.PORT || 3030)));' > server.js
 
 # 6. Ajustar permisos y cambiar a usuario no-root
 RUN chown -R appuser:appgroup /app
@@ -66,7 +66,7 @@ USER appuser
 
 # 7. Healthcheck
 HEALTHCHECK --interval=15s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget -qO- http://localhost:3700/healthz || exit 1
+  CMD wget -qO- http://localhost:3030/healthz || exit 1
 
-EXPOSE 3700
+EXPOSE 3030
 CMD ["node", "server.js"]
