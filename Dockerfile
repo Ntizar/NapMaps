@@ -12,7 +12,7 @@ ENV PORT=3700
 
 # 1. Dependencias
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --include=dev
 
 # 2. Código fuente
 COPY index.html vite.config.js ./
