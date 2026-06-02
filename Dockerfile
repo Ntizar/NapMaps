@@ -57,8 +57,7 @@ function handler(req, res) { \
     } \
   }); \
 } \
-const ports = [process.env.PORT || 3700, 80]; \
-ports.forEach(p => http.createServer(handler).listen(p, "0.0.0.0", () => console.log("NapMaps en puerto " + p)));' > server.js
+http.createServer(handler).listen(process.env.PORT || 3700, "0.0.0.0", () => console.log("NapMaps en puerto " + (process.env.PORT || 3700)));' > server.js
 
 # 6. Ajustar permisos y cambiar a usuario no-root
 RUN chown -R appuser:appgroup /app
@@ -67,8 +66,7 @@ USER appuser
 
 # 7. Healthcheck
 HEALTHCHECK --interval=15s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget -qO- http://localhost:80/ || exit 1
+  CMD wget -qO- http://localhost:3700/healthz || exit 1
 
 EXPOSE 3700
-EXPOSE 80
 CMD ["node", "server.js"]
