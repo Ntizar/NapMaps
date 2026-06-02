@@ -37,6 +37,11 @@ const MIME = { \
   ".ico": "image/x-icon", ".woff2": "font/woff2" \
 }; \
 function handler(req, res) { \
+  if (req.url === "/healthz") { \
+    res.writeHead(200, {"Content-Type": "application/json"}); \
+    res.end(JSON.stringify({status:"ok",uptime:process.uptime()})); \
+    return; \
+  } \
   let filePath = path.join(DIST, req.url === "/" ? "index.html" : req.url); \
   const ext = path.extname(filePath); \
   fs.readFile(filePath, (err, data) => { \
