@@ -59,12 +59,14 @@ npm run build
          └─────────┘  └─────────┘  └─────────┘
 ```
 
-### API Key Incluida
+### API Key de Stadia Maps
 
-La API key `89affde8-a8b8-43b6-ab33-67c48c2a43b7` se usa con **Stadia Maps** para:
-- Tiles vectoriales Alidade Smooth (calles, oscuro)
-- Modelo digital de elevación (terreno 3D)
-- Geocoding (futuro: búsqueda y rutas)
+Configura tu propia API key de **Stadia Maps** (gratuita en free tier):
+
+1. Regístrate en [stadiamaps.com](https://stadiamaps.com)
+2. Obtén tu API key del dashboard
+3. Crea un archivo `.env` con: `STADIA_API_KEY=tu_key_aqui`
+4. La key se inyecta en el build vía `process.env`
 
 > **Stadia Maps** usa el motor de renderizado de **OpenMapTiles** (vector tiles open-source) y proporciona **free tier** generoso. Ver [stadiamaps.com/pricing](https://stadiamaps.com/pricing).
 

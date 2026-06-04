@@ -144,8 +144,8 @@
     <div class="panel-card" style="padding:12px 16px">
       <div style="font-size:11px;color:var(--nap-text-dim);line-height:1.6">
         <strong style="color:var(--nap-text-muted)">NapMaps</strong> usa <strong>MapLibre GL JS</strong> (BSD)<br>
-        Tiles: CartoDB · ESRI · OpenFreeMap<br>
-        API: Stadia Maps (modelo abierto)
+        Tiles: CartoDB · ESRI · Terrarium (OpenStreetMap)<br>
+        100% abierto, sin API keys
       </div>
     </div>
   </div>
@@ -167,5 +167,16 @@
   <div class="toast" id="toast"></div>
 
   <script type="module" src="/src/js/app.js"></script>
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {
+          // SW no disponible — app funciona sin cache offline
+        });
+      });
+    }
+  </script>
 </body>
 </html>
