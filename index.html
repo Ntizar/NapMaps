@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/assets/index-C3FUIrr1.js"></script>
+  <script type="module" crossorigin src="/assets/index-Bo1hL0aE.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-Bqyl4n_I.css">
 </head>
 <body>
@@ -145,8 +145,8 @@
     <div class="panel-card" style="padding:12px 16px">
       <div style="font-size:11px;color:var(--nap-text-dim);line-height:1.6">
         <strong style="color:var(--nap-text-muted)">NapMaps</strong> usa <strong>MapLibre GL JS</strong> (BSD)<br>
-        Tiles: CartoDB · ESRI · OpenFreeMap<br>
-        API: Stadia Maps (modelo abierto)
+        Tiles: CartoDB · ESRI · Terrarium (OpenStreetMap)<br>
+        100% abierto, sin API keys
       </div>
     </div>
   </div>
@@ -167,5 +167,16 @@
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {
+          // SW no disponible — app funciona sin cache offline
+        });
+      });
+    }
+  </script>
 </body>
 </html>
