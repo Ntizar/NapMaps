@@ -8,6 +8,12 @@ export default defineConfig({
   base: '/',
   build: {
     outDir: 'dist',
-    sourcemap: false
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        // No añadir crossorigin para evitar problemas con servidores sin CORS headers
+        crossOriginLoading: false
+      }
+    }
   }
 });
